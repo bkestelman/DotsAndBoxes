@@ -1,30 +1,35 @@
-static final int WIN_W = 500;
-static final int WIN_H = 500;
-static final int BOX_W = 250;
-static final int BOX_H = 250;
+import java.util.Collections;
 
-static final int N = 3; //number of dots
+public static final int WIN_W = 250;
+public static final int WIN_H = 250;
+public static final int BOX_W = 250;
+public static final int BOX_H = 250;
 
-Dot[] dots = new Dot[N];
+static final int N = 2; //number of dots
+
+public static ArrayList<Dot> dots = new ArrayList<Dot>();
+public static ArrayList<Dot> dotsX = new ArrayList<Dot>(); //dots sorted by their x coor
+public static ArrayList<Dot> dotsY = new ArrayList<Dot>(); //dots sorted by their y coor
 
 void setup() {
-  size(500, 500);
+  size(250, 250);
   
   for(int i = 0; i < N; i++) {
-    dots[i] = new Dot(WIN_W/2 - BOX_W/2 + Math.random() * BOX_W, WIN_H/2 - BOX_H/2 + Math.random() * BOX_H);
+    Dot d = new Dot((float)Math.random() * BOX_W, (float)Math.random() * BOX_H, i);
+    dots.add(d);
+    dotsX.add(d);
+    dotsY.add(d);
   }
 }
 
 void draw() {
   background(255);
-  stroke(0);
-  fill(255);
-  rectMode(CENTER);
-  rect(WIN_W/2, WIN_H/2, BOX_W, BOX_H);
+  Collections.sort(dotsX, new xComparator());
+  Collections.sort(dotsY, new yComparator());
   
-  fill(0);
   for(int i = 0; i < N; i++) {
-    dots[i].display();
+    stroke(0);
+    fill(0);
+    dots.get(i).display();
   }
-    
 }
