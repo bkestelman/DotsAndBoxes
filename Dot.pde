@@ -34,6 +34,7 @@ public class yComparator implements Comparator<Dot> {
 public class Dot {
   float x, y, vx, vy, ax, ay; //2D position, velocity, acceleration
   int id;
+  float largest = 0;
   
   public Dot(float x, float y, int id) {
     this.id = id;
@@ -56,6 +57,11 @@ public class Dot {
       Box box = new Box(x 
     }*/
     
+    float largestP = 0; //largest rectangle touching dot in positive direction (either coor)
+    float largestN = 0; //largest rectangle touching dot in negative direction (either coor)
+    float cur = 0;
+    largest = 0;
+    
     //LEFT
     float prevUp = 0;
     float prevDown = BOX_H;
@@ -64,13 +70,15 @@ public class Dot {
       Dot dot = li.previous();
       if(dot.x < x && dot.y < prevDown && dot.y > prevUp) {
         rect(dot.x, prevUp, x, prevDown);
-        vx -= (x - dot.x) * (prevDown - prevUp);
+        cur = (x - dot.x) * (prevDown - prevUp);
+        if(cur > largestN) largestN = cur;
         if(dot.y < y) prevUp = dot.y;
         else prevDown = dot.y;
       }
     }
     rect(0, prevUp, x, prevDown);
-    vx -= x * (prevDown - prevUp);
+    cur = x * (prevDown - prevUp);
+    if(cur > largestN) largestN = cur;
     prevUp = 0;
     prevDown = BOX_H;
     //RIGHT
@@ -79,13 +87,20 @@ public class Dot {
       Dot dot = li.next();
       if(dot.x > x && dot.y < prevDown && dot.y > prevUp) {
         rect(x, prevUp, dot.x, prevDown);
-        vx += (dot.x - x) * (prevDown - prevUp);
+        cur = (dot.x - x) * (prevDown - prevUp);
+        if(cur > largestP) largestP = cur;
         if(dot.y < y) prevUp = dot.y;
         else prevDown = dot.y;
       }
     }
     rect(x, prevUp, BOX_W, prevDown);
-    vx += (BOX_W - x) * (prevDown - prevUp);
+    cur = (BOX_W - x) * (prevDown - prevUp);
+    if(cur > largestP) largestP = cur;
+    if(largestP > largestN) vx = largestP;
+    else vx = -largestN;
+    if(largestP > largest) largest = largestP;
+    if(largestN > largest) largest = largestN;
+    largestN = largestP = cur = 0;
     //UP
     float prevLeft = 0;
     float prevRight = BOX_W;
@@ -94,13 +109,15 @@ public class Dot {
       Dot dot = li.previous();
       if(dot.y < y && dot.x < prevRight && dot.x > prevLeft) {
         rect(prevLeft, dot.y, prevRight, y);
-        vy -= (y - dot.y) * (prevRight - prevLeft); 
+        cur = (y - dot.y) * (prevRight - prevLeft);
+        if(cur > largestN) largestN = cur;
         if(dot.x < x) prevLeft = dot.x;
         else prevRight = dot.x;
       }
     }
     rect(prevLeft, 0, prevRight, y);
-    vy -= y * (prevRight - prevLeft);
+    cur = y * (prevRight - prevLeft);
+    if(cur > largestN) largestN = cur;
     prevLeft = 0;
     prevRight = BOX_W;
     //DOWN
@@ -109,13 +126,19 @@ public class Dot {
       Dot dot = li.next();
       if(dot.y > y && dot.x < prevRight && dot.x > prevLeft) {
         rect(prevLeft, y, prevRight, dot.y);
-        vy += (dot.y - y) * (prevRight - prevLeft);
+        cur = (dot.y - y) * (prevRight - prevLeft);
+        if(cur > largestP) largestP = cur;
         if(dot.x < x) prevLeft = dot.x;
         else prevRight = dot.x;
       }
     }
     rect(prevLeft, BOX_H, prevRight, y);
-    vy += (BOX_H - y) * (prevRight - prevLeft);
+    cur = (BOX_H - y) * (prevRight - prevLeft);
+    if(cur > largestP) largestP = cur;
+    if(largestP > largestN) vy = largestP;
+    else vy = -largestN;
+    if(largestP > largest) largest = largestP;
+    if(largestN > largest) largest = largestN;
     vx /= BOX_W * BOX_H;
     vy /= BOX_W * BOX_H;
   }

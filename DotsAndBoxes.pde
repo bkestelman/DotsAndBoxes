@@ -27,14 +27,16 @@ void draw() {
   Collections.sort(dotsX, new xComparator());
   Collections.sort(dotsY, new yComparator());
   
+  float L = 0;
   for(int i = 0; i < N; i++) {
     stroke(0);
     fill(0);
     dots.get(i).display();
-    System.out.println("dotsX.get(" + i + ").vx: " + dotsX.get(i).vx);
-    System.out.println("dotsX.get(" + i + ").vy: " + dotsX.get(i).vy);
-    System.out.println("dotsX.get(" + i + ").x: " + dotsX.get(i).x);
-    System.out.println("dotsX.get(" + i + ").y: " + dotsX.get(i).y);
+    if(dots.get(i).largest > L) L = dots.get(i).largest;
+    //System.out.println("dotsX.get(" + i + ").vx: " + dotsX.get(i).vx);
+    //System.out.println("dotsX.get(" + i + ").vy: " + dotsX.get(i).vy);
+    //System.out.println("dotsX.get(" + i + ").x: " + dotsX.get(i).x);
+    //System.out.println("dotsX.get(" + i + ").y: " + dotsX.get(i).y);
     dots.get(i).move();
     
     boolean done = true;
@@ -45,5 +47,6 @@ void draw() {
       }
     }
     if(done) break;
+    System.out.println("L: " + L / (BOX_W*BOX_H));
   }
 }
