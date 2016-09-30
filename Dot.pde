@@ -35,18 +35,37 @@ public class Dot {
   float x, y, vx, vy, ax, ay; //2D position, velocity, acceleration
   int id;
   float largest = 0;
+  ArrayList<Float> xTrail, yTrail;
   
   public Dot(float x, float y, int id) {
     this.id = id;
     this.x = x;
     this.y = y;
     vx = vy = ax = ay = 0; 
+    xTrail = new ArrayList<Float>();
+    yTrail = new ArrayList<Float>();
+    xTrail.add(x);
+    yTrail.add(y);
+  };
   }
 
   public void display() {
     ellipse(x, y, 5, 5);
     vx = vy = 0;
     displayBoxes();
+    if(DISABLE_TRACKS) return;
+    for(int i = 0; i < xTrail.size(); i++) {
+      if(i == bestCycle) {
+        fill(150, 150, 0);
+        ellipse(xTrail.get(i), yTrail.get(i), 10, 10);
+        fill(0,100,100,50);
+      }
+      ellipse(xTrail.get(i), yTrail.get(i), 3, 3);
+    }
+    if(cycle < MAX_TRACKING_CYCLE) {
+      xTrail.add(x);
+      yTrail.add(y);
+    }
   }
   
   public void displayBoxes() {
@@ -96,8 +115,12 @@ public class Dot {
     rect(x, prevUp, BOX_W, prevDown);
     cur = (BOX_W - x) * (prevDown - prevUp);
     if(cur > largestP) largestP = cur;
-    if(largestP > largestN) vx = largestP;
+    if(largestP > largestN) {
+      vx = largestP;
+      //vx = 0.5;
+    }
     else vx = -largestN;
+    //else vx = -0.5;
     if(largestP > largest) largest = largestP;
     if(largestN > largest) largest = largestN;
     largestN = largestP = cur = 0;
@@ -135,12 +158,24 @@ public class Dot {
     rect(prevLeft, BOX_H, prevRight, y);
     cur = (BOX_H - y) * (prevRight - prevLeft);
     if(cur > largestP) largestP = cur;
-    if(largestP > largestN) vy = largestP;
+    if(largestP > largestN) {
+      //vy = 0.5;
+      vy = largestP;
+    }
+    //else vy = -0.5;
     else vy = -largestN;
     if(largestP > largest) largest = largestP;
     if(largestN > largest) largest = largestN;
     vx /= BOX_W * BOX_H;
     vy /= BOX_W * BOX_H;
+  }
+  
+  public float bestX() {
+    return xTrail.get(bestCycle);
+  }
+  
+  public float bestY() {
+    return yTrail.get(bestCycle);
   }
   
   /*public void displayNextLeftBox() {
